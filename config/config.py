@@ -7,7 +7,9 @@ import os
 class Config(object):
     PROJECT_ROOT = pathlib.Path(__file__).parent.parent.absolute()
     SECRET_KEY = os.getenv("SECRET_KEY")
-    GITHUB_API_KEY = os.getenv("GITHUB_API_KEY", False)
+    if "GITHUB_API_KEY" not in os.environ:
+        raise KeyError("Missing environment variable {}".format("GITHUB_API_KEY"))
+    GITHUB_API_KEY = os.environ.get("GITHUB_API_KEY")
 
 
 class DevelopmentConfig(Config):
