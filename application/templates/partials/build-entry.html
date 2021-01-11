@@ -1,0 +1,23 @@
+{% macro makeBuildEntry(build) %}
+    <table class="build-table">
+        <tr>
+            <td class="build-col">
+                <h4>{{build['name']}} (<a href="{{build['html_url']}}" target="_blank" rel="noopener noreferrer">{{build['run_id']}}</a>)</h4>
+                <h4>{{build['conclusion'] | capitalize}}</h4>
+                <p>{{build['event'] | capitalize}}</p>
+                {% if 'failed_step' in build %}
+                    <p>Failed at step: {{build['failed_step']}}</p>
+                {% endif %}
+            </td>
+          <td class="build-col">
+              <p>{{build['commit_author']}}</p>
+              <p>{{build['commit_message']}}</p>
+              <p>{{build['commit_id']}}</p>
+          </td>
+          <td class="build-col">
+              <p>{{build['created_at'] | format_date}}</p>
+              <p>{{build['time_elapsed']}}</p>
+          </td>
+        </tr>
+    </table>
+{% endmacro %}

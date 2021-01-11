@@ -1,0 +1,16 @@
+-e git+https://github.com/digital-land/frontend.git#egg=digital_land_frontend
+click==7.1.2
+decorator==4.4.2
+Flask==1.1.1
+Flask-WTF==0.14.3
+gunicorn==20.0.4
+itsdangerous==1.1.0
+Jinja2==2.11.1
+MarkupSafe==1.1.1
+python-dateutil==2.8.1
+python-dotenv==0.12.0
+pytz==2019.3
+six==1.14.0
+validators==0.14.2
+Werkzeug==1.0.0
+WTForms==2.2.1

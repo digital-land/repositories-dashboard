@@ -1,0 +1,61 @@
+.panel {
+    margin-top: 2rem !important;
+}
+
+.panel-heading {
+    display: flex;
+    flex-direction: row;
+}
+
+.panel-title {
+    flex-grow: 2;
+}
+
+.build-table {
+    table-layout: fixed;
+    width: 100%;
+}
+
+.build-col {
+    width: 33.3%;
+    padding: 2rem;
+    word-wrap:break-word;
+}
+
+.panel-build-success {
+    background-color: #32cd32ba !important;
+}
+
+.panel-build-failure {
+    background-color: #ff0000b5 !important;
+}
+
+.filters-container {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+.failure-checkbox {
+    padding-right: 2rem
+}
+
+.failure-checkbox label {
+    font-weight: inherit;
+    margin: unset;
+    vertical-align: middle;
+}
+
+.failure-checkbox input {
+    margin: unset;
+    vertical-align: middle;
+}
+
+.search-box {
+    width: 30%
+}
+
+.hide-from-success-checkbox, .hide-from-search {
+    display: none;
+}

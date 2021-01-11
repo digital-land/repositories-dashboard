@@ -1,0 +1,38 @@
+{% from "partials/build-entry.html" import makeBuildEntry -%}
+{% extends 'base.html' %}
+
+{% block head %}
+    {{ super() }}
+    <script type="text/javascript" src="{{ url_for('static',filename='javascripts/builds.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+  <h2>Builds</h2>
+  <div class="filters-container">
+    <div class="failure-checkbox">
+      <input type="checkbox" id="hide-success-checkbox" name="hide-success-checkbox" onclick="onClickHideSuccessful()" value="hide-successful">
+      <label for="hide-success-checkbox">Show only failing repositories</label><br>
+    </div>
+    <input type="text" class="search-box" id="filter-search-input" onkeyup="onFilterSearch()" placeholder="Repository name..">
+  </div>
+    <div id="repos-panel-group" class="panel-group">
+    {% for repo in repos %}
+      <div class="panel panel-default">
+        <div class="panel-heading {{'panel-build-success' if repo['builds'][0]['conclusion'] == 'success' else 'panel-build-failure'}}"
+        data-toggle="collapse" href="#collapse-{{repo['repository_name']}}">
+          <h3 class="panel-title">
+            <a>{{repo['repository_name']}}</a>
+          </h3>
+          <p> Last build: {{repo['builds'][0]['created_at'] | format_date}}</p>
+        </div>
+        <div id="collapse-{{repo['repository_name']}}" class="panel-collapse collapse">
+          <ul class="list-group">
+            {% for build in repo['builds'] %}
+              <li class="list-group-item">{{makeBuildEntry(build)}}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    {% endfor %}
+    </div>
+{% endblock %}
