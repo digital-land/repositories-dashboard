@@ -44,7 +44,7 @@ class GithubController:
         response = {}
 
         for x in range(30):
-            threading.Thread(target=self.task_runner, args=(q, response), daemon=True).start()
+            threading.Thread(target=self.task_runner, args=(q, response), daemon=False).start()
 
         for repo in repos:
             response[repo] = {}
