@@ -18,7 +18,7 @@
     <div id="repos-panel-group" class="panel-group">
     {% for repo in repos %}
       <div class="panel panel-default">
-        <div class="panel-heading {{'panel-build-success' if repo['builds'][0]['conclusion'] == 'success' else 'panel-build-failure'}}"
+        <div class="panel-heading {% if not repo['is_active'] %} panel-build-stopped {% elif repo['builds'][0]['conclusion'] == 'success' %} panel-build-success {% else %} panel-build-failure {% endif %}"
         data-toggle="collapse" href="#collapse-{{repo['repository_name']}}">
           <h3 class="panel-title">
             <a>{{repo['repository_name']}}</a>

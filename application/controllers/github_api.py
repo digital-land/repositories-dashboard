@@ -111,9 +111,15 @@ class GithubController:
 
             if len(builds) > 0:
                 builds.sort(reverse=True, key=lambda x: parser.isoparse(x["updated_at"]))
-                result.append({"repository_name": repo_name, "builds": builds})
+                result.append({"repository_name": repo_name,
+                               "is_active": self.is_repo_active(response[repo_name]),
+                               "builds": builds})
         result.sort(reverse=True, key=lambda x: parser.isoparse(x["builds"][0]["updated_at"]))
         return result
+
+    def is_repo_active(self, repo):
+        # Add any criteria here to check if repo is active
+        return repo["workflows"][0]["state"] == "active"
 
     def task_runner(self, task, q):
         response = self.session.get(task.url + "/" + task.url_node.val, params={"per_page": 5, "page": 1}).json()

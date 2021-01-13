@@ -30,6 +30,10 @@
     background-color: #ff0000b5 !important;
 }
 
+.panel-build-stopped {
+    background-color: #e8e816 !important;
+}
+
 .filters-container {
     display: flex;
     justify-content: flex-end;
