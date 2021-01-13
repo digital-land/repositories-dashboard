@@ -1,8 +1,9 @@
 import requests
-import threading, queue
-import time
+import queue
+import concurrent.futures
+import logging
 from dateutil import parser
-import pprint
+
 
 github_controller = None
 
@@ -43,18 +44,42 @@ class GithubController:
         key_list = Node("workflows", Node("workflow_runs", Node("jobs")))
         response = {}
 
-        for x in range(30):
-            threading.Thread(target=self.task_runner, args=(q, response), daemon=False).start()
-
         for repo in repos:
             response[repo] = {}
             key = key_list
             while key is not None:
                 response[repo][key.val] = []
                 key = key.next
-            q.put(self.Task("https://api.github.com/repos/digital-land/{}/actions".format(repo), repo, key_list, url_list))
 
-        q.join()
+        with concurrent.futures.ThreadPoolExecutor(max_workers=30) as executor:
+            future_to_task = {}
+            for repo in repos:
+                task = self.Task("https://api.github.com/repos/digital-land/{}/actions".format(repo), repo, key_list, url_list)
+                future_to_task[executor.submit(self.task_runner, task, q)] = task
+
+            while future_to_task:
+                done, not_done = concurrent.futures.wait(
+                    future_to_task, timeout=2,
+                    return_when=concurrent.futures.FIRST_COMPLETED)
+                while not q.empty():
+                    # fetch a task from the queue
+                    task = q.get()
+
+                    # Start the load operation and mark the future with its task
+                    future_to_task[executor.submit(self.task_runner, task, q)] = task
+
+                for future in done:
+                    task = future_to_task[future]
+                    try:
+                        output = future.result()
+                    except Exception as exc:
+                        logging.warning("GET %r generated an exception: %s" % (task.url, exc))
+                    else:
+                        for item in output:
+                            response[task.repo][task.key_node.val].append(item)
+
+                    # remove the now completed future
+                    del future_to_task[future]
 
         result = []
         for repo_name in response.keys():
@@ -90,18 +115,13 @@ class GithubController:
         result.sort(reverse=True, key=lambda x: parser.isoparse(x["builds"][0]["updated_at"]))
         return result
 
-    def task_runner(self, q, result):
-        while True:
-            task = q.get()
-            response = self.session.get(task.url + "/" + task.url_node.val, params={"per_page": 5, "page": 1}).json()
-            if task.key_node.next is not None:
-                for item in response[task.key_node.val]:
-                    q.put(self.Task(item["url"], task.repo, task.key_node.next, task.url_node.next))
+    def task_runner(self, task, q):
+        response = self.session.get(task.url + "/" + task.url_node.val, params={"per_page": 5, "page": 1}).json()
+        if task.key_node.next is not None:
+            for item in response[task.key_node.val]:
+                q.put(self.Task(item["url"], task.repo, task.key_node.next, task.url_node.next))
 
-            with threading.Lock():
-                for item in response[task.key_node.val]:
-                    result[task.repo][task.key_node.val].append(item)
-            q.task_done()
+        return response[task.key_node.val]
 
     class Task:
         def __init__(self, url, repo, key_node, url_node):
