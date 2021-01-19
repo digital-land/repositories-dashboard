@@ -6,8 +6,8 @@ SLACK_URL = os.environ.get("SLACK_WEBHOOK_URL")
 
 def smoke_test(url, test_text):
     resp = requests.get(url).text
-    if test_text in resp.lower():
-        requests.post(SLACK_URL, json={"text":"{} appears to be up!".format(url)})
+    if test_text not in resp.lower():
+        requests.post(SLACK_URL, json={"text":"{} appears to be down!".format(url)})
 
 
 if __name__ == "__main__":
