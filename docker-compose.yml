@@ -1,0 +1,17 @@
+version: "3.8"
+
+services:
+  dl_dashboard:
+    build:
+      context: .
+    volumes:
+      - .:/src
+    env_file: .flaskenv
+    environment:
+      - GITHUB_API_KEY
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+      - AWS_SESSION_TOKEN
+      - AWS_SECURITY_TOKEN
+    ports:
+      - 5000:5000

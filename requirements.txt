@@ -5,12 +5,13 @@ Flask==1.1.1
 Flask-WTF==0.14.3
 gunicorn==20.0.4
 itsdangerous==1.1.0
-Jinja2==2.11.1
+Jinja2~=2.11.0
 MarkupSafe==1.1.1
 python-dateutil==2.8.1
 python-dotenv==0.12.0
 pytz==2019.3
 six==1.14.0
+sqlite_s3_query==0.0.44
 validators==0.14.2
 Werkzeug==1.0.0
 WTForms==2.2.1
