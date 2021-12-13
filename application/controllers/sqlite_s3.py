@@ -1,10 +1,13 @@
+from dataclasses import dataclass
 from functools import partial
+from typing import Optional
 
 from sqlite_s3_query import sqlite_s3_query
 
 from config.config import Config
 
-class SqliteS3Controller:
+
+class SqliteS3Accessor:
     # TODO if this gets any more complicated then we need to instrument sqlalchemy here
 
     def __init__(self, bucket: str, db_path: str, region="eu-west-2"):
@@ -41,3 +44,33 @@ class SqliteS3Controller:
         ):
             for row in rows:
                 yield row
+
+
+@dataclass
+class Database:
+    bucket: str
+    database_path: str
+    query_args: tuple[str]
+    query_kwargs: dict
+    polling_result: Optional[str]
+
+
+class SqliteS3Controller:
+
+    def __init__(self, *args, **kwargs):
+        # TODO curl https://raw.githubusercontent.com/digital-land/specification/main/specification/dataset.csv and parse to get full dataset artifact list
+        self.databases = [
+            Database(
+                bucket='digital-land-collection',
+                database_path='digital-land.sqlite3',
+                query_args=('log',),
+                query_kwargs={'columns': 'entry_date', 'pagination_clauses': 'ORDER BY entry_date desc LIMIT 1'},
+                polling_result=None
+            )
+        ]
+
+    def get_all_databases(self):
+        for database in self.databases:
+            cont = SqliteS3Accessor(database.bucket, database.database_path)
+            database.polling_result = list(cont.select(*database.query_args, **database.query_kwargs))[0][0]
+        return [(database.bucket, database.database_path, database.polling_result) for database in self.databases]
