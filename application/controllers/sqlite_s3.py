@@ -50,7 +50,6 @@ class SqliteS3Accessor:
 class Database:
     bucket: str
     database_path: str
-    query_args: tuple[str]
     query_kwargs: dict
     polling_result: Optional[str]
 
@@ -63,8 +62,7 @@ class SqliteS3Controller:
             Database(
                 bucket='digital-land-collection',
                 database_path='digital-land.sqlite3',
-                query_args=('log',),
-                query_kwargs={'columns': 'entry_date', 'pagination_clauses': 'ORDER BY entry_date desc LIMIT 1'},
+                query_kwargs={'table_name': 'log', 'columns': 'entry_date', 'pagination_clauses': 'ORDER BY entry_date desc LIMIT 1'},
                 polling_result=None
             )
         ]
@@ -72,5 +70,5 @@ class SqliteS3Controller:
     def get_all_databases(self):
         for database in self.databases:
             cont = SqliteS3Accessor(database.bucket, database.database_path)
-            database.polling_result = list(cont.select(*database.query_args, **database.query_kwargs))[0][0]
+            database.polling_result = list(cont.select(**database.query_kwargs))[0][0]
         return [(database.bucket, database.database_path, database.polling_result) for database in self.databases]
