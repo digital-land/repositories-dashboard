@@ -73,7 +73,7 @@ class GithubController:
                     try:
                         output = future.result()
                     except Exception as exc:
-                        logging.warning("GET %r generated an exception: %s" % (task.url, exc))
+                        logging.warning("GET %r generated an exception: %s" % (task.url, exc), exc_info=True)
                     else:
                         for item in output:
                             response[task.repo][task.key_node.val].append(item)
@@ -105,6 +105,10 @@ class GithubController:
                 for job in build["jobs"]:
                     for step in job["steps"]:
                         if step["conclusion"] == "failure":
+                            logging.info(
+                                f"Registering failure on run {run['id']} of {repo_name} at {run['updated_at']}"
+                                f" during step - {step['name']}"
+                            )
                             build["failed_step"] = step["name"]
 
                 builds.append(build)
