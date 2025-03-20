@@ -1,3 +1,10 @@
+> [!IMPORTANT]
+> This application is deprecated
+
+# Application replacment
+
+This application tracked the actions in github, we have sinced moved to airflow which tracks the runs made and their results.
+
 # Github Repositories Dashboard
 
 
